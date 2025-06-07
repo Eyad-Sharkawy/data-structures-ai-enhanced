@@ -1,4 +1,9 @@
 "C:\Program Files\JetBrains\CLion 2024.3.1\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2024.3.1/bin/ninja/win/x64/ninja.exe" -G Ninja -S "C:\Users\eyadd\Documents\CPP\Data Structure" -B "C:\Users\eyadd\Documents\CPP\Data Structure\cmake-build-debug"
--- Configuring done (0.2s)
--- Generating done (0.1s)
--- Build files have been written to: C:/Users/eyadd/Documents/CPP/Data Structure/cmake-build-debug
+CMake Error: File C:/Users/eyadd/Documents/CPP/Data Structure/cmake/DataStructuresConfig.cmake.in does not exist.
+CMake Error at C:/Program Files/JetBrains/CLion 2024.3.1/bin/cmake/win/x64/share/cmake-3.30/Modules/CMakePackageConfigHelpers.cmake:501 (configure_file):
+  configure_file Problem configuring file
+Call Stack (most recent call first):
+  CMakeLists.txt:65 (configure_package_config_file)
+
+
+-- Configuring incomplete, errors occurred!

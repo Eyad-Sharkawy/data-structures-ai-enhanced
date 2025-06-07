@@ -1,80 +1,143 @@
-//
-// Created by eyadd on 2025-05-02.
-// Corrected and reviewed version.
-//
+/**
+ * @file Doubly_Linked_List.h
+ * @brief A template-based implementation of a doubly linked list with bidirectional traversal
+ * @author Eyadd
+ * @date 2025-05-02
+ * @version 2.0
+ */
 
 #ifndef DOUBLY_LINKED_LIST_H
 #define DOUBLY_LINKED_LIST_H
 
 #include <stdexcept> // For std::out_of_range
 #include <iostream>  // For the print() method
+#include <iterator>
 
-template <class t>
+/**
+ * @brief A template-based doubly linked list implementation
+ * @tparam T The type of elements stored in the list
+ */
+template <class T>
 class Doubly_Linked_List {
 private:
-    struct node {
-        node* next;
-        node* prev;
-        t item;
+    /**
+     * @brief Node structure for the doubly linked list
+     */
+    struct Node {
+        Node* next;
+        Node* prev;
+        T item;
+
+        explicit Node(const T& value) : next(nullptr), prev(nullptr), item(value) {}
+        explicit Node(T&& value) : next(nullptr), prev(nullptr), item(std::move(value)) {}
     };
-    node* front;
-    node* back;
-    unsigned long long length;
+
+    Node* front;
+    Node* back;
+    size_t length;
 
 public:
-    // Default constructor
-    Doubly_Linked_List(): front(nullptr), back(nullptr), length(0) {}
+    // Type definitions for STL compatibility
+    using value_type = T;
+    using reference = T&;
+    using const_reference = const T&;
+    using size_type = size_t;
 
-    // Copy constructor
+    /**
+     * @brief Default constructor
+     */
+    Doubly_Linked_List() noexcept : front(nullptr), back(nullptr), length(0) {}
+
+    /**
+     * @brief Copy constructor
+     * @param other The list to copy from
+     */
     Doubly_Linked_List(const Doubly_Linked_List& other) : front(nullptr), back(nullptr), length(0) {
-        // Creates a deep copy of the other list
-        node* temp = other.front;
+        Node* temp = other.front;
         while (temp != nullptr) {
-            this -> push_back(temp -> item);
+            push_back(temp->item);
             temp = temp->next;
         }
     }
 
-    // Copy assignment operator
-    Doubly_Linked_List& operator = (const Doubly_Linked_List& other) {
-        // Check for self-assignment
-        if (this == &other) {
-            return *this;
+    /**
+     * @brief Move constructor
+     * @param other The list to move from
+     */
+    Doubly_Linked_List(Doubly_Linked_List&& other) noexcept 
+        : front(other.front), back(other.back), length(other.length) {
+        other.front = nullptr;
+        other.back = nullptr;
+        other.length = 0;
+    }
+
+    /**
+     * @brief Copy assignment operator
+     * @param other The list to copy from
+     * @return Reference to this list
+     */
+    Doubly_Linked_List& operator=(const Doubly_Linked_List& other) {
+        if (this != &other) {
+            clear();
+            Node* temp = other.front;
+            while (temp != nullptr) {
+                push_back(temp->item);
+                temp = temp->next;
+            }
         }
-
-        // Clear the current list to prevent memory leaks
-        this->clear();
-
-        // Copy elements from the other list
-        node* temp = other.front;
-        while (temp != nullptr) {
-            this -> push_back (temp -> item);
-            temp = temp -> next;
-        }
-
         return *this;
     }
 
-    // Destructor
+    /**
+     * @brief Move assignment operator
+     * @param other The list to move from
+     * @return Reference to this list
+     */
+    Doubly_Linked_List& operator=(Doubly_Linked_List&& other) noexcept {
+        if (this != &other) {
+            clear();
+            front = other.front;
+            back = other.back;
+            length = other.length;
+            other.front = nullptr;
+            other.back = nullptr;
+            other.length = 0;
+        }
+        return *this;
+    }
+
+    /**
+     * @brief Destructor
+     */
     ~Doubly_Linked_List() {
         clear();
     }
 
-    [[nodiscard]] unsigned long long get_length() const {
+    /**
+     * @brief Get the current length of the list
+     * @return The number of elements in the list
+     */
+    [[nodiscard]] size_t size() const noexcept {
         return length;
     }
 
-    [[nodiscard]] bool empty() const {
+    /**
+     * @brief Check if the list is empty
+     * @return true if the list is empty, false otherwise
+     */
+    [[nodiscard]] bool empty() const noexcept {
         return length == 0;
     }
 
-    void push_back(t new_item) {
-        node* new_node = new node{nullptr, nullptr, new_item};
+    /**
+     * @brief Add an element to the end of the list
+     * @param value The value to add
+     */
+    void push_back(const T& value) {
+        Node* new_node = new Node(value);
         if (empty()) {
-            front = new_node;
-            back = new_node;
-        }
-        else {
+            front = back = new_node;
+        } else {
             back->next = new_node;
             new_node->prev = back;
             back = new_node;
@@ -82,11 +145,26 @@ public:
         ++length;
     }
 
-    void push_front (t new_item) {
-        node* new_node = new node{nullptr, nullptr, new_item};
+    /**
+     * @brief Add an element to the end of the list using move semantics
+     * @param value The value to add
+     */
+    void push_back(T&& value) {
+        Node* new_node = new Node(std::move(value));
         if (empty()) {
-            front = new_node;
+            front = back = new_node;
+        } else {
+            back->next = new_node;
+            new_node->prev = back;
             back = new_node;
+        }
+        ++length;
+    }
+
+    void push_front (T new_item) {
+        Node* new_node = new Node(new_item);
+        if (empty()) {
+            front = back = new_node;
         }
         else {
             front->prev = new_node;
@@ -96,7 +174,7 @@ public:
         ++length;
     }
 
-    void insert(const unsigned long long index, t new_item) {
+    void insert(const unsigned long long index, T new_item) {
         if (index > length) {
             throw std::out_of_range("Index out of range in insert()");
         }
@@ -108,7 +186,7 @@ public:
             push_back(new_item);
         }
         else {
-            node* temp;
+            Node* temp;
             // Optimization: traverse from the end that is closer to the index
             if (index <= length / 2) {
                 temp = front;
@@ -123,8 +201,7 @@ public:
                 }
             }
 
-            node* new_node = new node;
-            new_node->item = new_item;
+            Node* new_node = new Node(new_item);
             new_node->next = temp;
             new_node->prev = temp->prev;
             temp->prev->next = new_node;
@@ -136,7 +213,7 @@ public:
 
     void pop_back() {
         if (empty()) return;
-        node* temp = back;
+        Node* temp = back;
         if (front == back) {  // only one element
             front = back = nullptr;
         } else {
@@ -149,7 +226,7 @@ public:
 
     void pop_front() {
         if (empty()) return;
-        node* temp = front;
+        Node* temp = front;
         if (front == back) {  // only one element
             front = back = nullptr;
         } else {
@@ -175,7 +252,7 @@ public:
             return;
         }
 
-        node* temp;
+        Node* temp;
         // Optimization: traverse from the end that is closer to the index
         if (index <= (length / 2)) {
             temp = front;
@@ -196,9 +273,9 @@ public:
     }
 
     void clear() {
-        node* current = front;
+        Node* current = front;
         while (current != nullptr) {
-            node* next_node = current->next;
+            Node* next_node = current->next;
             delete current;
             current = next_node;
         }
@@ -212,8 +289,8 @@ public:
             return;
         }
 
-        node* current = front;
-        node* temp_ptr = nullptr;
+        Node* current = front;
+        Node* temp_ptr = nullptr;
 
         // Iterate through the list and swap the next and prev pointers for each node
         while (current != nullptr) {
@@ -236,7 +313,7 @@ public:
     }
 
     void print() const {
-        node* temp = front;
+        Node* temp = front;
         std::cout << "[ ";
         while (temp != nullptr) {
             std::cout << temp -> item << ' ';
@@ -245,79 +322,78 @@ public:
         std::cout << ']' << std::endl;
     }
 
-    class iterator {
+    /**
+     * @brief Iterator class for the doubly linked list
+     */
+    class Iterator {
     private:
-        node* curr;
-        // Private constructor so only the list class can create iterators
-        iterator(node* p) : curr(p) {}
+        Node* current;
 
     public:
-        // Make the list class a friend to allow access to the private constructor
-        friend class Doubly_Linked_List<t>;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*;
+        using reference = T&;
 
-        iterator(): curr(nullptr) {}
-        iterator(const iterator& other): curr(other.curr) {}
+        explicit Iterator(Node* node = nullptr) : current(node) {}
 
-        iterator& operator = (const iterator& other) {
-            if (this != &other) {
-                curr = other.curr;
-            }
+        reference operator*() {
+            if (!current) throw std::runtime_error("Dereferencing null iterator");
+            return current->item;
+        }
+
+        pointer operator->() {
+            if (!current) throw std::runtime_error("Dereferencing null iterator");
+            return &(current->item);
+        }
+
+        Iterator& operator++() {
+            if (current) current = current->next;
             return *this;
         }
 
-        bool operator == (const iterator& other) const {
-            return curr == other.curr;
-        }
-
-        bool operator != (const iterator& other) const {
-            return curr != other.curr;
-        }
-
-        t& operator* () {
-            if (curr) {
-                return curr->item;
-            }
-            throw std::runtime_error("Dereferencing a null iterator.");
-        }
-
-        // Pre-increment
-        iterator& operator ++ () {
-            if (curr) {
-                curr = curr->next;
-            }
-            return *this;
-        }
-
-        // Post-increment
-        iterator operator ++ (int) {
-            iterator temp = *this;
-            ++(*this);
+        Iterator operator++(int) {
+            Iterator temp = *this;
+            if (current) current = current->next;
             return temp;
         }
 
-        // Pre-decrement
-        iterator& operator -- () {
-            if (curr) {
-                curr = curr->prev;
-            }
+        Iterator& operator--() {
+            if (current) current = current->prev;
             return *this;
         }
 
-        // Post-decrement
-        iterator operator -- (int) {
-            iterator temp = *this;
-            --(*this);
+        Iterator operator--(int) {
+            Iterator temp = *this;
+            if (current) current = current->prev;
             return temp;
+        }
+
+        bool operator==(const Iterator& other) const {
+            return current == other.current;
+        }
+
+        bool operator!=(const Iterator& other) const {
+            return current != other.current;
         }
     };
 
-    iterator begin() {
-        return iterator(front);
+    /**
+     * @brief Get an iterator to the beginning of the list
+     * @return Iterator pointing to the first element
+     */
+    Iterator begin() {
+        return Iterator(front);
     }
 
-    iterator end() {
+    /**
+     * @brief Get an iterator to the end of the list
+     * @return Iterator pointing past the last element
+     */
+    Iterator end() {
         // end() is one position past the last element, which is represented by nullptr
-        return iterator(nullptr);
+        return Iterator(nullptr);
     }
 
 };
