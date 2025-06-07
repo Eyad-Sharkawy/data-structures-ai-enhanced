@@ -1,6 +1,17 @@
-# Data Structures Implementation
+# Data Structures Implementation (AI-Enhanced Version)
 
-A comprehensive C++ implementation of fundamental data structures with modern C++ features, extensive testing, and CI/CD support.
+This is an enhanced version of the [Data Structures and Algorithms](https://github.com/Eyad-Sharkawy/Data-Structure-and-Algorithms) repository, featuring modern C++ features, comprehensive testing, and CI/CD support.
+
+## Enhancements Over Original Version
+
+- Added modern C++17 features (move semantics, STL-compatible iterators)
+- Implemented comprehensive unit testing
+- Added CI/CD pipeline with GitHub Actions
+- Improved error handling with exceptions
+- Enhanced documentation and code organization
+- Added proper build system with CMake
+- Implemented memory leak prevention
+- Added cross-platform support
 
 ## Features
 
